@@ -5,7 +5,7 @@ import {
   validateCaptcha,
 } from "react-simple-captcha";
 import { AuthContext } from "../../providers/AuthProviders";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Swal from "sweetalert2";
 
@@ -13,6 +13,11 @@ const Login = () => {
   // const captchaRef = useRef(null);
   const [disabled, setDisabled] = useState(true);
   const { signIn } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.form?.pathname || "/";
 
   useEffect(() => {
     loadCaptchaEnginge(6);
@@ -27,23 +32,24 @@ const Login = () => {
     signIn(email, password).then((result) => {
       const user = result.user;
       console.log(user);
-Swal.fire({
-  title: "User Login Successful!",
-  showClass: {
-    popup: `
+      Swal.fire({
+        title: "User Login Successful!",
+        showClass: {
+          popup: `
       animate__animated
       animate__fadeInUp
       animate__faster
-    `
-  },
-  hideClass: {
-    popup: `
+    `,
+        },
+        hideClass: {
+          popup: `
       animate__animated
       animate__fadeOutDown
       animate__faster
-    `
-  }
-});
+    `,
+        },
+      });
+      navigate(from,{replace:true});
     });
   };
 
