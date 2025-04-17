@@ -1,19 +1,27 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import {RouterProvider} from "react-router-dom";
-import { router } from './routers/Routers.jsx';
-import {HelmetProvider } from 'react-helmet-async';
-import AuthProviders from './providers/AuthProviders.jsx';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routers/Routers.jsx";
+import { HelmetProvider } from "react-helmet-async";
+import AuthProviders from "./providers/AuthProviders.jsx";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
-createRoot(document.getElementById('root')).render(
+const queryClient = new QueryClient();
+
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-   <AuthProviders>
-   <HelmetProvider>
-      <div className='max-w-screen-xl mx-auto'>
-        <RouterProvider router={router} />
-      </div>
-    </HelmetProvider>
-   </AuthProviders>
-  </StrictMode>,
-)
+    <AuthProviders>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <div className="max-w-screen-xl mx-auto">
+            <RouterProvider router={router} />
+          </div>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </AuthProviders>
+  </StrictMode>
+);
