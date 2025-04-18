@@ -119,10 +119,9 @@ const Login = () => {
               <small>
                 New Here? <Link to={"/signup"}>Create an account</Link>{" "}
               </small>
-              <div className="mt-4">
               <SocialLogin></SocialLogin>
-              </div>
             </p>
+              
           </div>
         </div>
       </div>
