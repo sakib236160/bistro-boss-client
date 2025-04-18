@@ -4,36 +4,50 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../providers/AuthProviders";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const SignUp = () => {
-  const {register, handleSubmit, reset, formState: { errors },
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
   } = useForm();
 
-  const {createUser,updateUserProfile} = useContext(AuthContext)
+  const { createUser, updateUserProfile } = useContext(AuthContext);
+  const axiosPublic = useAxiosPublic();
 
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    console.log(data)
-    createUser(data.email, data.password)
-    .then(result=>{
+    console.log(data);
+    createUser(data.email, data.password).then((result) => {
       const loggedUser = result.user;
-      console.log(loggedUser)
-      updateUserProfile(data.name , data.photoURL)
-      .then(()=>{
-        console.log('User Profile info updated!')
-        reset();
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "User Created Successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
-        navigate("/");
-      })
-      .catch(error=>console.log(error))
-    })
+      console.log(loggedUser);
+      updateUserProfile(data.name, data.photoURL)
+        .then(() => {
+          // create user entry your database
+          const userInfo = {
+            name: data.name,
+            email: data.email,
+          };
+          axiosPublic.post("/users", userInfo).then((res) => {
+            if (res.data.insertedId) {
+              console.log("user added to the database!");
+              reset();
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "User Created Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              navigate("/");
+            }
+          });
+        })
+        .catch((error) => console.log(error));
+    });
   };
   return (
     <>
@@ -53,8 +67,6 @@ const SignUp = () => {
           <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
             <form onSubmit={handleSubmit(onSubmit)} className="card-body">
               <fieldset className="fieldset">
-
-
                 <label className="fieldset-label">Name</label>
                 <input
                   type="name"
@@ -66,8 +78,6 @@ const SignUp = () => {
                   <span className="text-red-600">This field is required</span>
                 )}
 
-
-
                 <label className="fieldset-label">Photo URL</label>
                 <input
                   type="name"
@@ -76,10 +86,10 @@ const SignUp = () => {
                   placeholder="Photo URL"
                 />
                 {errors.photoURL && (
-                  <span className="text-red-600">This Photo URL is required</span>
+                  <span className="text-red-600">
+                    This Photo URL is required
+                  </span>
                 )}
-
-
 
                 <label className="fieldset-label">Email</label>
                 <input
@@ -91,8 +101,6 @@ const SignUp = () => {
                 {errors.email && (
                   <span className="text-red-600">This email is required</span>
                 )}
-
-
 
                 <label className="fieldset-label">Password</label>
                 <input
@@ -120,9 +128,6 @@ const SignUp = () => {
                   <p className="text-red-400">First Name Is Required</p>
                 )}
 
-
-
-
                 <div>
                   <a className="link link-hover">Forgot password?</a>
                 </div>
@@ -134,7 +139,11 @@ const SignUp = () => {
                 {/* <button>Sing Up</button> */}
               </fieldset>
             </form>
-            <p><small>Already have an Account! <Link to={"/login"}>Login</Link> </small></p>
+            <p className="px-6 mb-4">
+              <small>
+                Already have an Account! <Link to={"/login"}>Login</Link>{" "}
+              </small>
+            </p>
           </div>
         </div>
       </div>
