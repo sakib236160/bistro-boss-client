@@ -2,37 +2,37 @@ import { FaTrashAlt } from "react-icons/fa";
 import useCart from "../../../hooks/useCart";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const [cart, refacth] = useCart();
   const axiosSecure = useAxiosSecure();
 
   const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
-  const handleDelete = id => {
+  const handleDelete = (id) => {
     Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-      }).then((result) => {
-        if (result.isConfirmed) {
-        axiosSecure.delete(`/carts/${id}`)
-        .then(res=>{
-            if(res.data.deletedCount> 0){
-                refacth();
-                   Swal.fire({
-            title: "Deleted!",
-            text: "Your file has been deleted.",
-            icon: "success"
-          });
-            }
-        })
-        }
-      });
-  }
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosSecure.delete(`/carts/${id}`).then((res) => {
+          if (res.data.deletedCount > 0) {
+            refacth();
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          }
+        });
+      }
+    });
+  };
   return (
     <div>
       <div className="flex justify-evenly items-center mb-10">
@@ -40,7 +40,13 @@ const Cart = () => {
         <h1 className="text-4xl text-gray-700">
           Total Price: ${totalPrice.toFixed(2)}
         </h1>
-        <button className="btn btn-primary">Pay</button>
+        {cart.length ? (
+          <Link to="/dashboard/payment">
+            <button className="btn btn-primary">Pay</button>
+          </Link>
+        ) : (
+          <button disabled className="btn btn-primary">Pay</button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -48,9 +54,7 @@ const Cart = () => {
           {/* head */}
           <thead>
             <tr>
-              <th>
-                SI.NO
-              </th>
+              <th>SI.NO</th>
               <th>Image</th>
               <th>Name</th>
               <th>Price</th>
@@ -58,11 +62,9 @@ const Cart = () => {
             </tr>
           </thead>
           <tbody>
-            {cart.map((item,index) => (
+            {cart.map((item, index) => (
               <tr key={item._id}>
-                <th>
-                    {index +1}
-                </th>
+                <th>{index + 1}</th>
                 <td>
                   <div className="flex items-center gap-3">
                     <div className="avatar">
@@ -75,14 +77,15 @@ const Cart = () => {
                     </div>
                   </div>
                 </td>
-                <td>
-                 {
-                    item.name
-                 }
-                </td>
+                <td>{item.name}</td>
                 <td>${item.price}</td>
                 <th>
-                  <button onClick={()=>handleDelete(item._id)} className="btn btn-ghost btn-lg"><FaTrashAlt className="text-red-600"></FaTrashAlt></button>
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="btn btn-ghost btn-lg"
+                  >
+                    <FaTrashAlt className="text-red-600"></FaTrashAlt>
+                  </button>
                 </th>
               </tr>
             ))}
